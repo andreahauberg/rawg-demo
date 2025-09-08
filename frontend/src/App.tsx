@@ -20,7 +20,7 @@ function App() {
         }
       >
         <GridItem pl="2" area={"nav"}>
-          <Nav/>
+          <Nav />
         </GridItem>
         <Show above="lg">
           <GridItem pl="2" bg="pink.300" area={"aside"}>
@@ -28,7 +28,7 @@ function App() {
           </GridItem>
         </Show>
         <GridItem pl="2" area={"main"}>
-          <GameGrid/>
+          <GameGrid />
         </GridItem>
       </Grid>
     </>
