@@ -15,7 +15,12 @@ export const GameCard = ({ game }: GameCardProps) => {
 
   return (
     <Card borderRadius={10} overflow={"hidden"}>
-      <Image src={getCroppedImageUrl(game.background_image)} alt={game.name} />
+      <Image
+        src={getCroppedImageUrl(game.background_image)}
+        alt={game.name}
+        height="200px"
+        objectFit="cover"
+      />
       <HStack justify={"space-between"} padding={2}>
         <PlatformIconsList
           platforms={game.parent_platforms.map((p) => p.platform)}
@@ -23,7 +28,13 @@ export const GameCard = ({ game }: GameCardProps) => {
         <CriticScore score={game.metacritic} />
       </HStack>
       <CardBody>
-        <Heading fontSize={"2xl"}>{game.name}</Heading>
+        <Heading
+          fontSize={{ base: "lg", md: "2xl" }}
+          noOfLines={2}
+          // lineHeight="short"
+          minH="3.5rem">
+          {game.name}
+        </Heading>
       </CardBody>
     </Card>
   );
