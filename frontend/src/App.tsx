@@ -1,13 +1,46 @@
-import { Nav } from "./components/Nav";
-import { GameGrid } from "./components/GameGrid";
-import "./css/App.css";
-import { Grid, GridItem, Show } from "@chakra-ui/react";
-import { GenreList } from "./components/GenreList";
+import { useState } from "react";
 
+
+
+import { Grid, GridItem, Show } from "@chakra-ui/react";
+
+
+
+import { GameGrid } from "./components/GameGrid";
+import { GenreList } from "./components/GenreList"
+import { Nav } from "./components/Nav";
+import {PlatformSelector} from "./components/PlatformSelector"
+import { StoreList } from "./components/StoreList";
+import "./css/App.css";
+import type { Platform } from "./hooks/useGames";
+import type { Genre } from "./hooks/useGenres";
+import type { Store } from "./hooks/useStores";
+
+
+
+
+
+export interface GameQuery {
+  genre: Genre | null;
+  platform: Platform | null;
+  store: Store | null;
+}
 
 
 function App() {
+  const [gameQuery, setGameQuery] = useState<GameQuery>({} as GameQuery);
 
+  const handleSelectGenre = (genre: Genre | null) => {
+    setGameQuery((prev) => ({ ...prev, genre }));
+  };
+
+  const handleSelectPlatform = (platform: Platform | null) => {
+    setGameQuery((prev) => ({ ...prev, platform }));
+  };
+
+  const handleSelectStore = (store: Store | null) => {
+    setGameQuery((prev) => ({ ...prev, store }));
+  };
 
   return (
     <>
@@ -26,11 +59,22 @@ function App() {
         </GridItem>
         <Show above="lg">
           <GridItem pl="2" area={"aside"}>
-            <GenreList/>
+            <GenreList
+              onSelectGenre={handleSelectGenre}
+              selectedGenre={gameQuery.genre}
+            />
+            <StoreList
+              onSelectStore={handleSelectStore}
+              selectedStore={gameQuery.store}
+            />
           </GridItem>
         </Show>
         <GridItem pl="2" area={"main"}>
-          <GameGrid />
+          <PlatformSelector
+            onSelectPlatform={handleSelectPlatform}
+            selectedPlatform={gameQuery.platform}
+          />
+          <GameGrid gameQuery={gameQuery} />
         </GridItem>
       </Grid>
     </>
@@ -38,5 +82,3 @@ function App() {
 }
 
 export default App
-
-
