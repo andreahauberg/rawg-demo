@@ -1,24 +1,28 @@
-import { Box, Flex } from "@chakra-ui/react";
 import { useState } from "react";
 
-import { GameHeading } from "./GameHeading";
+import { Box, Flex } from "@chakra-ui/react";
+
+import type { Platform } from "../hooks/useGames";
 import { GameControlls } from "./GameControlls";
+import { GameHeading } from "./GameHeading";
 import { GameViewOptions } from "./GameViewOptions";
 
-// Define the props type (optional callbacks for parent)
 interface GameHeaderProps {
-  onSortChange?: (value: string) => void;
-  onViewChange?: (value: string) => void;
+  selectedPlatform: Platform | null;
+  sortOrder: string | null;
+  onPlatformChange: (platform: Platform | null) => void;
+  onSortChange: (sortOrder: string | null) => void;
+  onViewChange?: (view: string) => void;
 }
 
-export const GameHeader = ({ onSortChange, onViewChange }: GameHeaderProps) => {
-  const [sort, setSort] = useState<string>("relevance");
+export const GameHeader = ({
+  selectedPlatform,
+  sortOrder,
+  onPlatformChange,
+  onSortChange,
+  onViewChange,
+}: GameHeaderProps) => {
   const [view, setView] = useState<string>("grid");
-
-  const handleSortChange = (value: string) => {
-    setSort(value);
-    onSortChange?.(value);
-  };
 
   const handleViewChange = (value: string) => {
     setView(value);
@@ -29,7 +33,12 @@ export const GameHeader = ({ onSortChange, onViewChange }: GameHeaderProps) => {
     <Box mb={6} px={2}>
       <GameHeading />
       <Flex justify="space-between" align="center">
-        <GameControlls sort={sort} onSortChange={handleSortChange} />
+        <GameControlls
+          selectedPlatform={selectedPlatform}
+          sortOrder={sortOrder}
+          onPlatformChange={onPlatformChange}
+          onSortChange={onSortChange}
+        />
         <GameViewOptions view={view} onViewChange={handleViewChange} />
       </Flex>
     </Box>

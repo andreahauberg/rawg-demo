@@ -1,30 +1,29 @@
-import { Text, HStack, Select } from "@chakra-ui/react";
+import { HStack } from "@chakra-ui/react";
+
+import type { Platform } from "../hooks/useGames";
+import { PlatformSelector } from "./PlatformSelector";
+import { SortSelector } from "./SortSelector";
 
 interface GameControllsProps {
-  sort: string;
-  onSortChange: (value: string) => void;
+  selectedPlatform: Platform | null;
+  sortOrder: string | null;
+  onPlatformChange: (platform: Platform | null) => void;
+  onSortChange: (sortOrder: string | null) => void;
 }
 
-export const GameControlls = ({ sort, onSortChange }: GameControllsProps) => {
+export const GameControlls = ({
+  selectedPlatform,
+  sortOrder,
+  onPlatformChange,
+  onSortChange,
+}: GameControllsProps) => {
   return (
-    <HStack spacing={2}>
-      <Text fontSize="sm" color="gray.300">
-        Order by:
-      </Text>
-      <Select
-        size="sm"
-        variant="filled"
-        value={sort}
-        onChange={(e) => onSortChange(e.target.value)}
-        bg="gray.700"
-        borderRadius="md"
-        color="white"
-        _hover={{ bg: "gray.600" }}>
-        <option value="relevance">Relevance</option>
-        <option value="release-date">Release date</option>
-        <option value="rating">Rating</option>
-        <option value="name">Name</option>
-      </Select>
+    <HStack spacing={5}>
+      <PlatformSelector
+        selectedPlatform={selectedPlatform}
+        onSelectPlatform={onPlatformChange}
+      />
+      <SortSelector sortOrder={sortOrder} onSelectSortOrder={onSortChange} />
     </HStack>
   );
 };
