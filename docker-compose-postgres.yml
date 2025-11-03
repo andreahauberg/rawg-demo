@@ -1,0 +1,62 @@
+# run without the seeder
+# docker-compose up --scale seeder=0
+services:
+  rawg-backend:
+    container_name: rawg-backend
+    build:
+      context: ./rawg-backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./rawg-backend:/app
+    ports:
+      - "5001:5001"
+    environment:
+      DATABASE_URL: postgres://root:rootpassword@postgres:5432/rawgDatabase
+      DB_TYPE: postgres
+      SERVER_URL: http://localhost:5001
+    depends_on:
+      - postgres
+
+  rawg-frontend:
+    container_name: rawg-frontend
+    build:
+      context: ./rawg-frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./rawg-frontend:/app
+      - /app/node_modules # Prevents overwriting node_modules on the container
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_URL: http://localhost:5001
+      CHOKIDAR_USEPOLLING: true # For file watching in Docker on some systems
+
+  seeder:
+    container_name: seeder
+    build:
+      context: ./seeder
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://root:rootpassword@postgres:5432/rawgDatabase
+      DB_TYPE: postgres
+    volumes:
+      - ./seeder:/app
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: rootpassword
+      POSTGRES_DB: rawgDatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data_rawg:/var/lib/postgresql/data
+
+volumes:
+  postgres-data_rawg:
+# if there are problems, remove it: 
+# docker volume rm rawg-fullstack-2025-fall_postgres-data_rawg
