@@ -17,8 +17,7 @@ interface GameOriginal {
 }
 
 async function insertData() {
-  await AppDataSource.initialize(); // Initialize the data source connection
-
+  // NOTE: Do NOT initialize the DataSource here — run() handles initialization.
   //get data from games.json and parse it:
   const rawData = fs.readFileSync("games.json", "utf-8");
   const parsedData = JSON.parse(rawData);
@@ -88,15 +87,9 @@ async function insertData() {
     );
 
     //deduplicate relations before saving:
-    game.genres = Array.from(
-      new Map(game.genres.map((g) => [g.id, g])).values()
-    );
-    game.parent_platforms = Array.from(
-      new Map(game.parent_platforms.map((pp) => [pp.id, pp])).values()
-    );
-    game.stores = Array.from(
-      new Map(game.stores.map((s) => [s.id, s])).values()
-    );
+    game.genres = Array.from(new Map(game.genres.map((g) => [g.id, g])).values());
+    game.parent_platforms = Array.from(new Map(game.parent_platforms.map((pp) => [pp.id, pp])).values());
+    game.stores = Array.from(new Map(game.stores.map((s) => [s.id, s])).values());
 
     // Now save the game itself - it will also save the relationships in the join tables
     await gameRepo.save(game);
@@ -104,13 +97,28 @@ async function insertData() {
   }
 }
 
-insertData()
-  .then(() => {
-    console.log("Data insertion completed.");
+// Run the seeder with proper lifecycle handling: initialize, run, destroy.
+async function run() {
+  try {
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+    }
 
-    AppDataSource.destroy(); // Close the data source connection
-    process.exit(); // Exit the process
-  })
-  .catch((error) => {
+    await insertData();
+    console.log("Data insertion completed.");
+    process.exit(0);
+  } catch (error) {
     console.error("Error during data insertion:", error);
-  });
+    process.exitCode = 1;
+  } finally {
+    try {
+      if (AppDataSource.isInitialized) {
+        await AppDataSource.destroy();
+      }
+    } catch (e) {
+      // ignore destroy errors
+    }
+  }
+}
+
+run();
